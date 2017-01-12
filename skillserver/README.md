@@ -33,22 +33,16 @@ Creating an Alexa Skill web service is easy with `go-alexa/skillserver`. Simply 
 Here's a simple, but complete web service example:
 
 ```go
-package main
-
-import (
-	alexa "github.com/mikeflynn/go-alexa/skillserver"
-)
-
-var Applications = map[string]interface{}{
-	"/echo/helloworld": alexa.EchoApplication{ // Route
-		AppID:    "xxxxxxxx", // Echo App ID from Amazon Dashboard
-		OnIntent: EchoIntentHandler,
-		OnLaunch: EchoIntentHandler,
-	},
-}
 
 func main() {
-	alexa.Run(Applications, "3000")
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	jeopardyHandler := alexa.ValidateRequest(alexa.VerifyJSON("xxxxx", EchoJeopardy))
+
+	http.HandleFunc("/echo/jeopardy", jeopardyHandler)
+
+	http.ListenAndServe(":3000", nil)
+	err := http.ListenAndServeTLS(":3000", cert, key, nil)
 }
 
 func EchoIntentHandler(echoReq *alexa.EchoRequest, echoResp *alexa.EchoResponse) {
